@@ -1,6 +1,6 @@
 /* 
 nome : Shop Da Antonio
-versione : 1.4.1
+versione : 2.0.0
 descrizione : Simulazione di un negozio
 FUNZIONALITA ATTUALI : 
 	-Scelta quanti prodotti comprare
@@ -10,13 +10,12 @@ FUNZIONALITA ATTUALI :
 	-Media costo di bevanda, cibo e dolce
 	-Costo totale di bevanda, cibo e dolce
 	-Possibilita di ricevere resto se da piu del Tot costo
-	-Array scontrino  
+	-Array scontrino 
+	-Implementazione grafica
+	-Stampa scontrino 
 FUNZIONALITA FUTURE : 
 	-Ricevere sconto dopo X prodotti 
-	-Rimuovere x quantita di bevanda, cibo o dolce  IN CORSO
-	-Implementazione interfaccia
 	-Array scorte e quantita 
-	-Stampa scontrino  IN CORSO
 CHANGELOG :
 	V 1.2.0 
 		Aggiunte :
@@ -55,6 +54,13 @@ CHANGELOG :
 			-mediaBevande, scontrinoBevande, totBevande
 			-mediaCibo, scontrinoCibo, totCibo
 			-mediaDolce, scontrinoDolce, totDolce
+	V 2.0.0
+		Implementanzioni:
+		-Grafica
+		-Stampa scontrino
+		Rimozioni:
+		-Variabili riguardanti le bevande, cibo e dolci
+
 */
 
 #include <stdio.h>

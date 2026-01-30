@@ -1,6 +1,6 @@
 /* 
 nome : Shop Da Antonio
-versione : 2.0.0
+versione : 2.1.0
 descrizione : Simulazione di un negozio
 FUNZIONALITA ATTUALI : 
 	-Scelta quanti prodotti comprare
@@ -15,7 +15,7 @@ FUNZIONALITA ATTUALI :
 	-Stampa scontrino 
 FUNZIONALITA FUTURE : 
 	-Ricevere sconto dopo X prodotti 
-	-Array scorte e quantita 
+	-Array scorte e quantita IN CORSO 
 CHANGELOG :
 	V 1.2.0 
 		Aggiunte :
@@ -60,6 +60,9 @@ CHANGELOG :
 		-Stampa scontrino
 		Rimozioni:
 		-Variabili riguardanti le bevande, cibo e dolci
+	V 2.1.0
+		Aggiunte:
+		-Array scorte e quantita
 
 */
 
@@ -72,15 +75,20 @@ int main() {
 	// Dichiarazione variabili
 	int prodotti; // Numero di prodotti che vuole comprare l'utente
 	int maxScontrino = 2000, scorte = 500, scontrinoLunghezza = 0, uscita = 0,
-		scontrinoQuantita[scorte], scontrinoTot;
-	float prezzo, totScontrino, pagamento, resto,  
+		scontrinoQuantita[scorte], scontrinoQuantitaTot, scorteQuantita[3] = {200,200,200}, prodottoIndex;
+	float prezzo, scontrinoPrezzoTot, pagamento, resto,  
 		scontrinoMedia, scontrinoPrezzo[scorte];
-	char risposta, scontrinoProdotto[scorte]; // Risposta utente se bevanda o cibo
+	char risposta, scontrinoProdotto[scorte], scorteProdotti[3] = {'b','c','d'}; // Risposta utente se bevanda o cibo
 	
 	// Acquisizione dati e calcoli	
 	do { 
 		
 		do {
+			for (int i = 0; i < 3; i++) {
+				if ( scorteQuantita[i] > 0) printf("\t [ %c \t\t] \n", scorteProdotti[i]);
+			}
+			printf("\t [ e = ESCI \t]\n");
+			/*
 			printf
 			( 	"\n\n"
 				"\t[ b = bevanda \t]\n"
@@ -88,7 +96,8 @@ int main() {
 				"\t[ d = dolce \t]\n"
 				"\t[ e = ESCI \t]\n"
 			);
-			printf("\nVuoi una bevanda, un cibo o un dolce?\t");
+			*/
+			printf("\nCosa vuoi acquistare?\t");
 			scanf(" %c",&risposta); // Risposta utente se bevanda, cibo o dolce
 			risposta = ( tolower(risposta) );
 			scontrinoProdotto[ scontrinoLunghezza ] = risposta; 
@@ -99,6 +108,20 @@ int main() {
 			uscita = 1;
 			break;
 		}
+		
+		switch (risposta) {
+				case 'b':
+					prodottoIndex = 0;
+					break;
+				
+				case 'c':
+					prodottoIndex = 1;
+					break;
+
+				case 'd':
+					prodottoIndex = 2;
+					break;
+				};
 		
 		do {
 			printf("\nQuanti ne vuoi comprare?[ES. 4] \t");
@@ -114,11 +137,22 @@ int main() {
 	        	while ((c = getchar()) != '\n' && c != EOF) { }
 	        	scontrinoQuantita[ scontrinoLunghezza ] = -1; // Per ripetere il ciclo
 	    	} else {
-	        	continue;
+	        	scorteQuantita[prodottoIndex] -= scontrinoQuantita[scontrinoLunghezza];
+				if ( scorteQuantita[prodottoIndex] < 0 ) {
+					printf(
+						"\nHai chiesto %d ," 
+						" noi abbiamo solo %d ," 
+						" quindi possiamo darti solo %d "
+						, scontrinoQuantita[scontrinoLunghezza]
+						, ( scontrinoQuantita[scontrinoLunghezza] + scorteQuantita[prodottoIndex] )
+						, ( scontrinoQuantita[scontrinoLunghezza] + scorteQuantita[prodottoIndex] )
+					);
+					scontrinoQuantita[scontrinoLunghezza] = scontrinoQuantita[scontrinoLunghezza] + scorteQuantita[prodottoIndex];	
+				}
 	    	}
 		} while ( scontrinoQuantita[ scontrinoLunghezza ] < 0);
 		
-		scontrinoTot += scontrinoQuantita[ scontrinoLunghezza ];
+		scontrinoQuantitaTot += scontrinoQuantita[ scontrinoLunghezza ];
 		
 		do {          
 			printf("\nQuanto costa?[ES. 3.54] \t\t");
@@ -142,28 +176,28 @@ int main() {
 		} while ( scontrinoPrezzo[ scontrinoLunghezza ] < 0 ); // Se l'utente da un valore minore di 0
 		
 		if ( scontrinoLunghezza == 0 ) {
-			totScontrino = scontrinoPrezzo[ scontrinoLunghezza ] * scontrinoQuantita[ scontrinoLunghezza ];
+			scontrinoPrezzoTot = scontrinoPrezzo[ scontrinoLunghezza ] * scontrinoQuantita[ scontrinoLunghezza ];
 		} else {
-			totScontrino += ( scontrinoPrezzo[ scontrinoLunghezza ] * scontrinoQuantita[ scontrinoLunghezza ] ); 
+			scontrinoPrezzoTot += ( scontrinoPrezzo[ scontrinoLunghezza ] * scontrinoQuantita[ scontrinoLunghezza ] ); 
 		}
 		
-		printf("\nCARRELLO ATTUALE: \t\t\t%.2f EUR", totScontrino);
+		printf("\nCARRELLO ATTUALE: \t\t\t%.2f EUR\n\n", scontrinoPrezzoTot);
 		
 		scontrinoLunghezza++;
 		
 	} while ( uscita != 1 );
 		
-	scontrinoMedia = totScontrino / scontrinoTot; // Media del prezzo totale
+	scontrinoMedia = scontrinoPrezzoTot / scontrinoQuantitaTot; // Media del prezzo totale
 	
 	// Visualizzazione dati
 
 	if ( scontrinoLunghezza > 0 ) {
 		
 		do {
-			printf("\nTotale scontrino: %.2f ", totScontrino );
+			printf("\nTotale scontrino: %.2f ", scontrinoPrezzoTot );
 			printf("\nCome vuoi pagare il tutto?[ES. 3.54]\t");
-			if ( scanf("%f", &pagamento) != 1 || pagamento < totScontrino) {
-	        	if ( pagamento < totScontrino ) printf("\nErrore: valore non valido");
+			if ( scanf("%f", &pagamento) != 1 || pagamento < scontrinoPrezzoTot) {
+	        	if ( pagamento < scontrinoPrezzoTot ) printf("\nErrore: valore non valido");
 				
 	        	// Pulire il buffer di input
 	        	int c;
@@ -172,8 +206,8 @@ int main() {
 	    	} else {
 	        	continue;
 	    	}
-			if ( pagamento > totScontrino ) resto = pagamento - totScontrino;
-		} while ( pagamento < totScontrino);
+			if ( pagamento > scontrinoPrezzoTot ) resto = pagamento - scontrinoPrezzoTot;
+		} while ( pagamento < scontrinoPrezzoTot);
 		
 		printf("\n========================================================");
 		printf("\n                       SHOP                             ");
@@ -183,7 +217,7 @@ int main() {
 		"\nPrezzo totale: \t\t %.2f EUR"
 		"\nMedia prezzo totale: \t %.2f EUR"
 		"\nPagamento: \t\t %.2f EUR"
-		,scontrinoTot, totScontrino, scontrinoMedia, pagamento
+		,scontrinoQuantitaTot, scontrinoPrezzoTot, scontrinoMedia, pagamento
 		);
 		
 		if ( resto > 0 ) printf("\nResto: \t\t\t %.2f EUR", resto);
@@ -193,10 +227,4 @@ int main() {
 	
 	return 0;
 }
-
-/* 
-entro dentro
-scelgo i prodotti in base ai miei soldi
-pago la somma totale al cassiere
-ricevo lo scontrino
-*/
+// @TODO FIX STAMPA SCONTRINO

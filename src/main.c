@@ -155,18 +155,18 @@ void inizializzaScorte(char scorteProdotti[][MAXSTRINGA])
 int main()
 {
 	// Dichiarazione variabili
-	int scontrinoLunghezza = 0,				 // Indica il numero di prodotti presenti nello scontrino
-		uscita = 0,							 // Controlla l'uscita
-		scontrinoQuantita[SCORTE],			 // Salva le quantita di ogni prodotto comprato
-		scontrinoQuantitaTot = 0,			 // Quantita totale di ogni prodotto comprato
-		scorteQuantita[3] = {200, 200, 200}, // Quantita disponibili in magazzino
-		prodottoIndex;						 // Indice del prodotto scelto
+	int scontrinoLunghezza = 0,				 	// Indica il numero di prodotti presenti nello scontrino
+		uscita = 0,							 	// Controlla l'uscita
+		scontrinoQuantita[SCORTE],			 	// Salva le quantita di ogni prodotto comprato
+		scontrinoQuantitaTot = 0,			 	// Quantita totale di ogni prodotto comprato
+		scorteQuantita[3] = {200, 200, 200}, 	// Quantita disponibili in magazzino
+		prodottoIndex;							// Indice del prodotto scelto
 
-	float scontrinoPrezzoTot,	 // Prezzo totale dello scontrino
-		pagamento,				 // Soldi inseriti dall'utente
-		resto,					 // Eventuale resto da dare all'utente
-		scontrinoPrezzo[SCORTE], // Prezzo di ogni prodotto acquistato
-		sconto = 0;				 // Percentuale di sconto
+	float scontrinoPrezzoTot,	 				// Prezzo totale dello scontrino
+		pagamento,				 				// Soldi inseriti dall'utente
+		resto,					 				// Eventuale resto da dare all'utente
+		scontrinoPrezzo[SCORTE], 				// Prezzo di ogni prodotto acquistato
+		sconto = 0;				 				// Percentuale di sconto
 
 	char scontrinoProdotto[SCORTE][MAXSTRINGA], // Matrice contenente i nomi dei prodotti comprati
 		risposta[MAXSTRINGA],					// Risposta dell'utente
@@ -267,10 +267,7 @@ int main()
 			else
 			{
 				// Pulire il buffer di input
-				int c;
-				while ((c = getchar()) != '\n' && c != EOF)
-				{
-				}
+				pulisciBuffer();
 				continue;
 			}
 
@@ -327,10 +324,7 @@ int main()
 					printf("\nErrore: valore non valido");
 
 				// Pulire il buffer di input
-				int c;
-				while ((c = getchar()) != '\n' && c != EOF)
-				{
-				}
+				pulisciBuffer();
 				pagamento = -1; // Per ripetere il ciclo
 			}
 			else

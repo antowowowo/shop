@@ -7,9 +7,7 @@ descrizione : Simulazione di un negozio
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#define SCORTE 500		  // Indica la dimensione massima dell'array
-#define MAXSCONTRINO 2000 // Indica il prezzo massimo di un prodotto
-#define MAXSTRINGA 10	  // Indica la lunghezza massima di una stringa
+#include "lib.h"
 
 /*
 - Pulisce una variabile char nel caso si metta un numero -
@@ -99,36 +97,96 @@ void stampaScontrino(
 	int quantita[],
 	int quantitaTot,
 	float prezzo[],
-	float prezzoTot,
-	float sconto,
 	float pagamento,
-	float resto)
+	float resto,
+	float prezzoProdottiScontrino[],
+	char fraseSconto[],
+	float mediaScontrino,
+	char fraseResto[],
+	float subtotale,
+	float iva,
+	float totale)
 {
+	
 	printf("\n========================================================");
 	printf("\n                       SHOP                             ");
 	printf("\n========================================================");
 	for (int i = 0; i < size; i++)
 	{
 		printf(
-			"\n%s x%d  %.2f = %.2f", prodotto[i], quantita[i], prezzo[i], prezzo[i] * quantita[i]);
+			"\n%s x%d  %.2f = %.2f", prodotto[i], quantita[i], prezzo[i], prezzoProdottiScontrino[i]);
 	}
 	printf("\n--------------------------------------------------------");
 	printf("\nProdotti comprati: \t %d", quantitaTot);
-	printf("\nCosto totale: \t\t %.2f EUR", prezzoTot);
-	if (sconto > 0)
-	{
-		printf("\nSconto:\t\t\t -%.2f", sconto * prezzoTot);			// Calcolo dello sconto
-		printf("\nTotale scontato:\t %.2f ", prezzoTot * (1 - sconto)); // Calcolo del prezzo scontato
-	}
-
-	if (prezzoTot > 0 && quantitaTot > 0)
-		printf("\nMedia prezzo unitario: \t %.2f EUR", ((float)prezzoTot / quantitaTot)); // Calcolo della media prezzo unitario
-
+	
+	printf("\nMedia prezzo unitario: \t %.2f EUR", mediaScontrino); // Calcolo della media prezzo unitario
+	printf("\nSubtotale: \t %.2f", subtotale);
+	printf("\nIVA: %.2f", iva);
+	printf("\n%s", fraseSconto);
+	printf("\nTotale: %.2f", totale);
 	printf("\nPagamento: \t\t %.2f EUR", pagamento);
 
-	if (resto > 0)
-		printf("\nResto: \t\t\t %.2f EUR", resto);
+	printf("\n%s", fraseResto);
 	printf("\n========================================================");
+}
+
+
+void inizializzaScontrino(
+	int size,
+	char prodotto[][MAXSTRINGA],
+	int quantita[],
+	int quantitaTot,
+	float prezzo[],
+	float prezzoTot,
+	float sconto,
+	float pagamento,
+	float resto)
+{
+	float prezzoProdottiScontrino[100];
+	for (int i = 0; i < size; i++)
+	{
+		prezzoProdottiScontrino[i] = prezzo[i] * quantita[i];
+	}
+	float valoreSconto = prezzoTot * sconto;
+    char fraseSconto[100];
+
+    // Assegnazione condizionale con snprintf
+    if (valoreSconto == 0) {
+        strcpy(fraseSconto, "\0"); // Stringa vuota
+    } else {
+        snprintf(fraseSconto, sizeof(fraseSconto), "\nSconto:\t\t\t -%.2f", valoreSconto);
+    }
+
+	float subtotale = prezzoTot, 
+		  totale = prezzoTot,
+		  iva = calcolaIva(prezzoTot);
+
+	totale = totale + iva - valoreSconto;
+
+	float mediaScontrino = calcolaMedia(totale, quantitaTot);
+
+	char fraseResto[100];
+	if ( resto == 0 ) {
+		strcpy(fraseResto, "\0");
+	} else {
+		snprintf(fraseResto, sizeof(fraseResto), "\nResto: \t\t\t %.2f EUR", resto);
+	}
+	stampaScontrino( 
+		 size,
+		 prodotto,
+		 quantita,
+		 quantitaTot,
+		 prezzo,
+		 pagamento,
+		 resto,
+		 prezzoProdottiScontrino,
+		 fraseSconto,
+		 mediaScontrino,
+		 fraseResto,
+		 subtotale,
+		 iva,
+		 totale
+	);
 }
 
 /*
@@ -154,19 +212,20 @@ void inizializzaScorte(char scorteProdotti[][MAXSTRINGA])
 
 int main()
 {
+	printf("%d", 10 * 0);
 	// Dichiarazione variabili
-	int scontrinoLunghezza = 0,				 	// Indica il numero di prodotti presenti nello scontrino
-		uscita = 0,							 	// Controlla l'uscita
-		scontrinoQuantita[SCORTE],			 	// Salva le quantita di ogni prodotto comprato
-		scontrinoQuantitaTot = 0,			 	// Quantita totale di ogni prodotto comprato
-		scorteQuantita[3] = {200, 200, 200}, 	// Quantita disponibili in magazzino
-		prodottoIndex;							// Indice del prodotto scelto
+	int scontrinoLunghezza = 0,				 // Indica il numero di prodotti presenti nello scontrino
+		uscita = 0,							 // Controlla l'uscita
+		scontrinoQuantita[SCORTE],			 // Salva le quantita di ogni prodotto comprato
+		scontrinoQuantitaTot = 0,			 // Quantita totale di ogni prodotto comprato
+		scorteQuantita[3] = {200, 200, 200}, // Quantita disponibili in magazzino
+		prodottoIndex;						 // Indice del prodotto scelto
 
-	float scontrinoPrezzoTot,	 				// Prezzo totale dello scontrino
-		pagamento,				 				// Soldi inseriti dall'utente
-		resto,					 				// Eventuale resto da dare all'utente
-		scontrinoPrezzo[SCORTE], 				// Prezzo di ogni prodotto acquistato
-		sconto = 0;				 				// Percentuale di sconto
+	float scontrinoPrezzoTot,	 // Prezzo totale dello scontrino
+		pagamento,				 // Soldi inseriti dall'utente
+		resto,					 // Eventuale resto da dare all'utente
+		scontrinoPrezzo[SCORTE], // Prezzo di ogni prodotto acquistato
+		sconto = 0;				 // Percentuale di sconto
 
 	char scontrinoProdotto[SCORTE][MAXSTRINGA], // Matrice contenente i nomi dei prodotti comprati
 		risposta[MAXSTRINGA],					// Risposta dell'utente
@@ -342,7 +401,7 @@ int main()
 			scontrinoQuantita,
 			scontrinoProdotto);
 
-		stampaScontrino(
+		inizializzaScontrino(
 			scontrinoLunghezza,
 			scontrinoProdotto,
 			scontrinoQuantita,

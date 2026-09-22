@@ -1,0 +1,3 @@
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\anton\AppData\Local\Temp\cc033ZTr.o:main.c:(.text+0x633): undefined reference to `calcolaIva'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\anton\AppData\Local\Temp\cc033ZTr.o:main.c:(.text+0x672): undefined reference to `calcolaMedia'
+collect2.exe: error: ld returned 1 exit status2

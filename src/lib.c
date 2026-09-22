@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "lib.h"
+#define IVA 0.04
 
 /*
 - Ordina un array float -
@@ -104,3 +106,11 @@ void printArrayMatrixChar( char matrix[][MAXSTRINGA], int size ) {
             printf("\n[[DEBUG]] " fmt "\n", ##__VA_ARGS__); \
         } \
     } while (0)
+
+float calcolaIva(float n){
+	return n * IVA;
+}
+
+float calcolaMedia(float x, int y){
+	return ((float)x / y);
+}

@@ -5,214 +5,20 @@ descrizione : Simulazione di un negozio
 */
 
 #include <stdio.h>
-#include <ctype.h>
 #include <string.h>
 #include "lib.h"
 
-/*
-- Pulisce una variabile char nel caso si metta un numero -
-*/
-int pulisciBuffer()
-{
-	int c;
-	while ((c = getchar()) != '\n' && c != EOF)
-	{
-	}
-}
-
-/*
-- Confronta la risposta con l'utente con il tipo di scorta -
-- risposta sta per la risposta dell'utente -
-- scorta sono definite all'inizio del codice -
-*/
-int cercaProdotto(char risposta[], char scorta[][MAXSTRINGA])
-{
-	printf("\nRicerca prodotto . . .");
-	int segnaposto = -1;
-	for (int i = 0; i < 3; i++)
-	{
-		if (strcmp(risposta, scorta[i]) == 0)
-		{
-			printf("\nTrovato.\n");
-			segnaposto = i;
-		}
-	}
-	if (segnaposto == -1)
-		printf("\nNon trovato.\n");
-
-	return segnaposto;
-}
-
-/*
-- Ordina gli array in base a scontrinoPrezzo in ordine decrescente -
-- size sta per la dimensione -
-- scontrinoPrezzo[] sta per il prezzo -
-- scontrinoQuantita[] sta per la quantita acquistata del prodotto -
-- scontrinoProdotto[][MAXSTRINGA] sta per il prodotto acquistato -
-*/
-void scontrinoSorting(int size, float scontrinoPrezzo[], int scontrinoQuantita[], char scontrinoProdotto[][MAXSTRINGA])
-{
-	for (int i = 0; i < size - 1; i++)
-	{
-		for (int j = 0; j < size - i - 1; j++)
-		{
-			// Se scontrinoPrezzo[j + 1] e' maggiore di scontrinoPrezzo[j] avviene il bubble sorting
-			if (scontrinoPrezzo[j] < scontrinoPrezzo[j + 1])
-			{
-				// Scambio di valori della variabile scontrinoPrezzo
-				float temp1 = scontrinoPrezzo[j];
-				scontrinoPrezzo[j] = scontrinoPrezzo[j + 1];
-				scontrinoPrezzo[j + 1] = temp1;
-
-				// Scambio di valori della variabile scontrinoQuantita
-				int temp2 = scontrinoQuantita[j];
-				scontrinoQuantita[j] = scontrinoQuantita[j + 1];
-				scontrinoQuantita[j + 1] = temp2;
-
-				// Scambio di valori della variabile scontrinoProdotto
-				char temp3[MAXSTRINGA];
-				strcpy(temp3, scontrinoProdotto[j]);
-				strcpy(scontrinoProdotto[j], scontrinoProdotto[j + 1]);
-				strcpy(scontrinoProdotto[j + 1], temp3);
-			}
-		}
-	}
-}
-
-/*
-- Stampa lo scontrino -
-- size sta per la dimensione -
-- prodotto sono il tipo di scorta scelto dall'utente -
-- quantita e' il numero di scorte prese dall'utente -
-- quantitatot e' la somma di tutte le quantita -
-- prezzo e' il valore di un prodotto -
-- prezzotot e' la somma di tutti i prezzi -
-- sconto e' la percentuale di sconto -
-- pagamento e' il numero con cui l'utente paga -
-- resto e' il possibile di soldi in piu che torna all'utente -
-*/
-void stampaScontrino(
-	int size,
-	char prodotto[][MAXSTRINGA],
-	int quantita[],
-	int quantitaTot,
-	float prezzo[],
-	float pagamento,
-	float resto,
-	float prezzoProdottiScontrino[],
-	char fraseSconto[],
-	float mediaScontrino,
-	char fraseResto[],
-	float subtotale,
-	float iva,
-	float totale)
-{
-	
-	printf("\n========================================================");
-	printf("\n                       SHOP                             ");
-	printf("\n========================================================");
-	for (int i = 0; i < size; i++)
-	{
-		printf(
-			"\n%s x%d  %.2f = %.2f", prodotto[i], quantita[i], prezzo[i], prezzoProdottiScontrino[i]);
-	}
-	printf("\n--------------------------------------------------------");
-	printf("\nProdotti comprati: \t %d", quantitaTot);
-	
-	printf("\nMedia prezzo unitario: \t %.2f EUR", mediaScontrino); // Calcolo della media prezzo unitario
-	printf("\nSubtotale: \t %.2f", subtotale);
-	printf("\nIVA: %.2f", iva);
-	printf("\n%s", fraseSconto);
-	printf("\nTotale: %.2f", totale);
-	printf("\nPagamento: \t\t %.2f EUR", pagamento);
-
-	printf("\n%s", fraseResto);
-	printf("\n========================================================");
-}
-
-
-void inizializzaScontrino(
-	int size,
-	char prodotto[][MAXSTRINGA],
-	int quantita[],
-	int quantitaTot,
-	float prezzo[],
-	float prezzoTot,
-	float sconto,
-	float pagamento,
-	float resto)
-{
-	float prezzoProdottiScontrino[100];
-	for (int i = 0; i < size; i++)
-	{
-		prezzoProdottiScontrino[i] = prezzo[i] * quantita[i];
-	}
-	float valoreSconto = prezzoTot * sconto;
-    char fraseSconto[100];
-
-    // Assegnazione condizionale con snprintf
-    if (valoreSconto == 0) {
-        strcpy(fraseSconto, "\0"); // Stringa vuota
-    } else {
-        snprintf(fraseSconto, sizeof(fraseSconto), "\nSconto:\t\t\t -%.2f", valoreSconto);
-    }
-
-	float subtotale = prezzoTot, 
-		  totale = prezzoTot,
-		  iva = calcolaIva(prezzoTot);
-
-	totale = totale + iva - valoreSconto;
-
-	float mediaScontrino = calcolaMedia(totale, quantitaTot);
-
-	char fraseResto[100];
-	if ( resto == 0 ) {
-		strcpy(fraseResto, "\0");
-	} else {
-		snprintf(fraseResto, sizeof(fraseResto), "\nResto: \t\t\t %.2f EUR", resto);
-	}
-	stampaScontrino( 
-		 size,
-		 prodotto,
-		 quantita,
-		 quantitaTot,
-		 prezzo,
-		 pagamento,
-		 resto,
-		 prezzoProdottiScontrino,
-		 fraseSconto,
-		 mediaScontrino,
-		 fraseResto,
-		 subtotale,
-		 iva,
-		 totale
-	);
-}
-
-/*
-- Sostituisce lo \n con il terminatore \0 -
-*/
-char *pulisciStringa(char stringa[])
-{
-	int posizione = strcspn(stringa, "\n"); // Si segna la posizione dello \n
-	stringa[posizione] = '\0';				// \n viene sostituito con \0
-
-	return stringa;
-}
-
-/*
-- Inizializza i prodotti delle scorte -
-*/
-void inizializzaScorte(char scorteProdotti[][MAXSTRINGA])
-{
-	strcpy(scorteProdotti[0], "bevanda");
-	strcpy(scorteProdotti[1], "cibo");
-	strcpy(scorteProdotti[2], "dolce");
-}
-
 int main()
 {
-	printf("%d", 10 * 0);
+	struct Scontrino{
+		int lunghezza;
+		int quantita[SCORTE];
+		int quantitaTot;
+		float prezzoTot;
+		float prezzo[SCORTE];
+		char prodotto[3][MAXSTRINGA];
+	};
+	
 	// Dichiarazione variabili
 	int scontrinoLunghezza = 0,				 // Indica il numero di prodotti presenti nello scontrino
 		uscita = 0,							 // Controlla l'uscita
@@ -366,8 +172,9 @@ int main()
 	// Visualizzazione dati
 	if (scontrinoLunghezza > 0)
 	{
-
+		
 		// Acquisizione come vuole pagare
+		/*
 		do
 		{
 			printf("\nTotale scontrino: %.2f ", scontrinoPrezzoTot);
@@ -394,14 +201,14 @@ int main()
 				}
 			}
 		} while (pagamento < (scontrinoPrezzoTot * (1 - sconto)));
-
+		*/
 		scontrinoSorting(
 			scontrinoLunghezza,
 			scontrinoPrezzo,
 			scontrinoQuantita,
 			scontrinoProdotto);
 
-		inizializzaScontrino(
+		float totale = inizializzaScontrino(
 			scontrinoLunghezza,
 			scontrinoProdotto,
 			scontrinoQuantita,
@@ -411,6 +218,8 @@ int main()
 			sconto,
 			pagamento,
 			resto);
+		
+		gestionePagamento(totale);
 	}
 
 	return 0;

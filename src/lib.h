@@ -58,5 +58,7 @@ char *pulisciStringa(char stringa[]);
 
 void inizializzaScorte(char scorteProdotti[][MAXSTRINGA]);
 
+char *acquisisciStringa(char domanda[], int min, int max);
 
+int acquisisciInt(char domanda[], int min, int max);
 #endif

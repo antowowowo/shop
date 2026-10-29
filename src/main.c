@@ -10,7 +10,8 @@ descrizione : Simulazione di un negozio
 
 int main()
 {
-	struct Scontrino{
+	struct Scontrino
+	{
 		int lunghezza;
 		int quantita[SCORTE];
 		int quantitaTot;
@@ -18,24 +19,22 @@ int main()
 		float prezzo[SCORTE];
 		char prodotto[3][MAXSTRINGA];
 	};
-	
+
 	// Dichiarazione variabili
-	int scontrinoLunghezza = 0,				 // Indica il numero di prodotti presenti nello scontrino
-		uscita = 0,							 // Controlla l'uscita
-		scontrinoQuantita[SCORTE],			 // Salva le quantita di ogni prodotto comprato
-		scontrinoQuantitaTot = 0,			 // Quantita totale di ogni prodotto comprato
+	int uscita = 0,							 // Controlla l'uscita
 		scorteQuantita[3] = {200, 200, 200}, // Quantita disponibili in magazzino
 		prodottoIndex;						 // Indice del prodotto scelto
 
-	float scontrinoPrezzoTot,	 // Prezzo totale dello scontrino
-		pagamento,				 // Soldi inseriti dall'utente
-		resto,					 // Eventuale resto da dare all'utente
-		scontrinoPrezzo[SCORTE], // Prezzo di ogni prodotto acquistato
-		sconto = 0;				 // Percentuale di sconto
+	float pagamento, // Soldi inseriti dall'utente
+		resto,		 // Eventuale resto da dare all'utente
+		sconto = 0;	 // Percentuale di sconto
 
-	char scontrinoProdotto[SCORTE][MAXSTRINGA], // Matrice contenente i nomi dei prodotti comprati
-		risposta[MAXSTRINGA],					// Risposta dell'utente
-		scorteProdotti[3][MAXSTRINGA];			// Risposta utente se bevanda, cibo o dolce
+	char risposta[MAXSTRINGA],		   // Risposta dell'utente
+		scorteProdotti[3][MAXSTRINGA]; // Risposta utente se bevanda, cibo o dolce
+
+	struct Scontrino scontrino;
+	scontrino.lunghezza = 0;
+	scontrino.quantitaTot = 0;
 
 	inizializzaScorte(scorteProdotti);
 	// Acquisizione dati e calcoli
@@ -54,64 +53,54 @@ int main()
 			printf("\t [ e = ESCI \t]\n");
 
 			// Acquisizione cosa vuole acquistare
-			printf("\nCosa vuoi acquistare?\t");
-			fgets(risposta, MAXSTRINGA, stdin);
-			pulisciStringa(risposta);
+			strcpy(
+				risposta,
+				acquisisciStringa("\nCosa vuoi acquistare?\t", 1, 8));
+
 			if (strcmp(risposta, "e") == 0)
 			{
 				uscita = 1;
 				break;
 			}
-			else
-			{
-				strcpy(scontrinoProdotto[scontrinoLunghezza], risposta);
-			}
 
-			prodottoIndex = cercaProdotto(scontrinoProdotto[scontrinoLunghezza], scorteProdotti);
+			prodottoIndex = cercaProdotto(risposta, scorteProdotti);
 
 		} while (prodottoIndex < 0);
+
+		strcpy(scontrino.prodotto[scontrino.lunghezza], risposta);
 
 		// Controllo scontrinoProdotto[scontrinoLunghezza]
 		if (uscita == 1)
 			break;
 
 		// Acquisizione quanti prodotti vuole comprare
-		do
+
+		scontrino.quantita[scontrino.lunghezza] =
+			acquisisciInt("\nQuanti ne vuoi comprare?[ES. 4] \t", 0, scorteQuantita[prodottoIndex]);
+		printf("\nQuanti ne vuoi comprare?[ES. 4] \t");
+
+		/* TODO:
+			invertire la logica
+		*/ 
+		scorteQuantita[prodottoIndex] -= scontrino.quantita[scontrino.lunghezza];
+
+		// Se non ci sono abbastanza prodotti
+		if (scorteQuantita[prodottoIndex] < 0)
 		{
-			printf("\nQuanti ne vuoi comprare?[ES. 4] \t");
-			if (
-				scanf("%d", &scontrinoQuantita[scontrinoLunghezza]) != 1 || scontrinoQuantita[scontrinoLunghezza] < 1)
-			{
-				printf("\nErrore: valore non valido");
+			printf(
+				"\nHai chiesto %d ,"
+				" noi abbiamo solo %d ,"
+				" quindi possiamo darti solo %d ",
+				scontrino.quantita[scontrino.lunghezza],
+				(scontrino.quantita[scontrino.lunghezza] + scorteQuantita[prodottoIndex]), 
+				(scontrino.quantita[scontrino.lunghezza] + scorteQuantita[prodottoIndex])
+			);
 
-				pulisciBuffer();
-				/*
-				int c;
-				while ((c = getchar()) != '\n' && c != EOF)
-				{
-				}
-				*/
-				scontrinoQuantita[scontrinoLunghezza] = -1; // Per ripetere il ciclo
-			}
-			else
-			{
-				scorteQuantita[prodottoIndex] -= scontrinoQuantita[scontrinoLunghezza];
-
-				// Se non ci sono abbastanza prodotti
-				if (scorteQuantita[prodottoIndex] < 0)
-				{
-					printf(
-						"\nHai chiesto %d ,"
-						" noi abbiamo solo %d ,"
-						" quindi possiamo darti solo %d ",
-						scontrinoQuantita[scontrinoLunghezza], (scontrinoQuantita[scontrinoLunghezza] + scorteQuantita[prodottoIndex]), (scontrinoQuantita[scontrinoLunghezza] + scorteQuantita[prodottoIndex]));
-					scontrinoQuantita[scontrinoLunghezza] = scontrinoQuantita[scontrinoLunghezza] + scorteQuantita[prodottoIndex];
-				}
-			}
-		} while (scontrinoQuantita[scontrinoLunghezza] < 1);
+			scontrino.quantita[scontrino.lunghezza] = scontrino.quantita[scontrino.lunghezza] + scorteQuantita[prodottoIndex];
+		}
 
 		// Incremento dei prodotti tot acquistati
-		scontrinoQuantitaTot += scontrinoQuantita[scontrinoLunghezza];
+		scontrino.quantitaTot += scontrino.quantita[scontrino.lunghezza];
 
 		// Acquisizione prezzo del prodotto
 		do
@@ -119,15 +108,15 @@ int main()
 			printf("\nQuanto costa?[ES. 3.54] \t\t");
 
 			if (
-				scanf("%f", &scontrinoPrezzo[scontrinoLunghezza]) != 1 || scontrinoPrezzo[scontrinoLunghezza] < 0.01 || scontrinoPrezzo[scontrinoLunghezza] > MAXSCONTRINO)
+				scanf("%f", &scontrino.prezzo[scontrino.lunghezza]) != 1 || scontrino.prezzo[scontrino.lunghezza] < 0.01 || scontrino.prezzo[scontrino.lunghezza] > MAXSCONTRINO)
 			{
-				if (scontrinoPrezzo[scontrinoLunghezza] > MAXSCONTRINO)
+				if (scontrino.prezzo[scontrino.lunghezza] > MAXSCONTRINO)
 					printf("\nErrore: non puoi aver pagato piu di %d euro", MAXSCONTRINO);
 				else
 					printf("\nErrore: hai inserito un numero negativo o una lettera");
 
 				pulisciBuffer();
-				scontrinoPrezzo[scontrinoLunghezza] = -1; // Per ripetere il ciclo
+				scontrino.prezzo[scontrino.lunghezza] = -1; // Per ripetere il ciclo
 			}
 			else
 			{
@@ -136,29 +125,29 @@ int main()
 				continue;
 			}
 
-		} while (scontrinoPrezzo[scontrinoLunghezza] < 0.01); // Se l'utente da un valore minore di 1 centesimo
+		} while (scontrino.prezzo[scontrino.lunghezza] < 0.01); // Se l'utente da un valore minore di 1 centesimo
 
 		// Assegnazione del prezzo totale
-		if (scontrinoLunghezza == 0)
+		if (scontrino.lunghezza == 0)
 		{
-			scontrinoPrezzoTot = scontrinoPrezzo[scontrinoLunghezza] * scontrinoQuantita[scontrinoLunghezza];
+			scontrino.prezzoTot = (float)scontrino.prezzo[scontrino.lunghezza] * scontrino.quantita[scontrino.lunghezza];
 		}
 		else
 		{
-			scontrinoPrezzoTot += scontrinoPrezzo[scontrinoLunghezza] * scontrinoQuantita[scontrinoLunghezza];
+			scontrino.prezzoTot += (float)scontrino.prezzo[scontrino.lunghezza] * scontrino.quantita[scontrino.lunghezza];
 		}
 
-		printf("\nCARRELLO ATTUALE: \t\t\t%.2f EUR\n\n", scontrinoPrezzoTot);
+		printf("\nCARRELLO ATTUALE: \t\t\t%.2f EUR\n\n", scontrino.prezzoTot);
 
 		// Incremento variabile
-		scontrinoLunghezza++;
+		scontrino.lunghezza++;
 
 	} while (uscita != 1);
 
 	// Possibilita sconto dopo 5 prodotti comprati
-	if (scontrinoQuantitaTot >= 5)
+	if (scontrino.quantitaTot >= 5)
 	{
-		if (scontrinoQuantitaTot >= 10)
+		if (scontrino.quantitaTot >= 10)
 		{
 			sconto = 0.10; // Sconto del 10%
 		}
@@ -166,13 +155,13 @@ int main()
 		{
 			sconto = 0.05; // Sconto del 5%
 		}
-		printf("\nHai ricevuto uno sconto del %.2f %% grazie al numero dei tuoi acquisti[%d]!", sconto * 100, scontrinoQuantitaTot);
+		printf("\nHai ricevuto uno sconto del %.2f %% grazie al numero dei tuoi acquisti[%d]!", sconto * 100, scontrino.quantitaTot);
 	}
 
 	// Visualizzazione dati
-	if (scontrinoLunghezza > 0)
+	if (scontrino.lunghezza > 0)
 	{
-		
+
 		// Acquisizione come vuole pagare
 		/*
 		do
@@ -203,22 +192,22 @@ int main()
 		} while (pagamento < (scontrinoPrezzoTot * (1 - sconto)));
 		*/
 		scontrinoSorting(
-			scontrinoLunghezza,
-			scontrinoPrezzo,
-			scontrinoQuantita,
-			scontrinoProdotto);
+			scontrino.lunghezza,
+			scontrino.prezzo,
+			scontrino.quantita,
+			scontrino.prodotto);
 
 		float totale = inizializzaScontrino(
-			scontrinoLunghezza,
-			scontrinoProdotto,
-			scontrinoQuantita,
-			scontrinoQuantitaTot,
-			scontrinoPrezzo,
-			scontrinoPrezzoTot,
+			scontrino.lunghezza,
+			scontrino.prodotto,
+			scontrino.quantita,
+			scontrino.quantitaTot,
+			scontrino.prezzo,
+			scontrino.prezzoTot,
 			sconto,
 			pagamento,
 			resto);
-		
+
 		gestionePagamento(totale);
 	}
 

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "lib.h"
 #define IVA 0.04
-#define DEBUG 0
+#define DEBUG 1
 #define printDebug(fmt, ...)                                \
 	do                                                      \
 	{                                                       \
@@ -123,7 +123,7 @@ void printArrayMatrixChar(char matrix[][MAXSTRINGA], int size)
 	}
 }
 
-/* 
+/*
 - Calcola la percentuale di iva nel prezzo -
 */
 float calcolaIva(float n)
@@ -182,10 +182,9 @@ int cercaProdotto(char risposta[], char scorta[][MAXSTRINGA])
 */
 void scontrinoSorting(
 	int size,
-	float scontrinoPrezzo[], 
-	int scontrinoQuantita[], 
-	char scontrinoProdotto[][MAXSTRINGA]
-)
+	float scontrinoPrezzo[],
+	int scontrinoQuantita[],
+	char scontrinoProdotto[][MAXSTRINGA])
 {
 	for (int i = 0; i < size - 1; i++)
 	{
@@ -298,10 +297,10 @@ float inizializzaScontrino(
 	{
 		prezzoProdottiScontrino[i] = prezzo[i] * quantita[i];
 	}
-	
+
 	/* ---- Calcolo valoreSconto ---- */
 	float valoreSconto = prezzoTot * sconto;
-	
+
 	/* ---- Calcolo fraseSconto ---- */
 	char fraseSconto[100];
 	if (valoreSconto == 0)
@@ -331,7 +330,7 @@ float inizializzaScontrino(
 	{
 		snprintf(fraseResto, sizeof(fraseResto), "\nResto: \t\t\t %.2f EUR", resto);
 	}
-	
+
 	/* ---- Chiamata finale della funzione stampaScontrino ---- */
 	stampaScontrino(
 		size,
@@ -351,27 +350,33 @@ float inizializzaScontrino(
 	return totale;
 }
 
-void gestionePagamento(float totale){
+void gestionePagamento(float totale)
+{
 	float pagamento,
-		  resto;
-	do {
-		printf("\nTotale scontrino: %.2f ",totale);
+		resto;
+	do
+	{
+		printf("\nTotale scontrino: %.2f ", totale);
 		printf("\nCome vuoi pagare il tutto?[ES. 3.54] ");
-		if ( scanf("%f",&pagamento) != 1 || pagamento < totale ) {
-			if (pagamento < totale) {
+		if (scanf("%f", &pagamento) != 1 || pagamento < totale)
+		{
+			if (pagamento < totale)
+			{
 				printf("\nErrore: valore non valido");
 
 				// Pulire il buffer di input
 				pulisciBuffer();
 				pagamento = -1; // Per ripetere il ciclo
 			}
-				
-		} else {
-			if ( pagamento > totale ) {
+		}
+		else
+		{
+			if (pagamento > totale)
+			{
 				resto = pagamento - totale;
 			}
 		}
-	} while ( pagamento != 1 || pagamento < totale );
+	} while (pagamento != 1 || pagamento < totale);
 }
 
 /*
@@ -393,4 +398,30 @@ void inizializzaScorte(char scorteProdotti[][MAXSTRINGA])
 	strcpy(scorteProdotti[0], "bevanda");
 	strcpy(scorteProdotti[1], "cibo");
 	strcpy(scorteProdotti[2], "dolce");
+}
+
+char *acquisisciStringa(char domanda[], int min, int max)
+{
+	char stringa[max];
+	do
+	{
+		printf("%s", domanda);
+		fgets(stringa, max, stdin);
+		pulisciStringa(stringa);
+		if (strlen(stringa) < min || strlen(stringa) > max)
+			printf("\nErrore: la lunghezza della stringa deve essere tra %d e %d.", min, max);
+	} while (strlen(stringa) < min || strlen(stringa) > max);
+	return stringa;
+}
+
+int acquisisciInt(char domanda[], int min, int max)
+{
+	int num;
+	do {
+		printf("%s", domanda);
+		scanf("%d",&num);
+		pulisciBuffer();
+		if ( num < min || num > max ) printf("\nErrore: deve essere tra %d e %d.", min, max);
+	} while ( num < min || num > max );
+	return num;
 }
